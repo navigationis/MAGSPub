@@ -40,16 +40,29 @@ def plat2sph(ix: np.ndarray, iy: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     lon = np.rad2deg(np.arctan2(iy, ix))
     return lon, lat
 
-def distance(long1, lat1, long2, lat2, r=3444, units='degrees'):
+def distance(long1, lat1, long2, lat2, r=3444):
     """
     Returns the distance (in nm, by default) between two points on a sphere.
+
+    Parameters
+    ----------
+    long1   : float or ndarray
+        Longitude of start point
+    lat1    : float or ndarray
+        Latitude of start point
+    long2   : float or ndarray
+        Longitude of end point
+    lat2    : float or ndarray
+        Latitude of end point
+    r       : float
+        Radius of sphere (Earth radius default, in nm. Change to preferred distance units)
+
     """
-    if units == 'degrees':
-        lat1 = np.deg2rad(lat1)
-        lat2 = np.deg2rad(lat2)
-        long1 = np.deg2rad(long1)
-        long2 = np.deg2rad(long2)
-        
+    lat1 = np.deg2rad(lat1)
+    lat2 = np.deg2rad(lat2)
+    long1 = np.deg2rad(long1)
+    long2 = np.deg2rad(long2)
+    
     return 2*r*np.arcsin(np.sqrt((np.sin((lat1-lat2)/2))**2 + 
                          np.cos(lat1)*np.cos(lat2)*(np.sin((long1-long2)/2))**2))
 
@@ -62,10 +75,14 @@ class TabulatedFieldModel:
     def grad(self, lon: float, lat: float) -> tuple[float, float]:
         lon = np.deg2rad(lon)
         lat = np.deg2rad(lat)
+        page = 0
+        if lat < 0: 
+            lat = -lat
+            page = 1
         r = (np.pi/2 - lat) * self.RG / (np.pi/2)
         ix = (r * np.cos(lon)).astype(np.int32)
         iy = (r * np.sin(lon)).astype(np.int32)
-        gx, gy = np.gradient(self.m[0,ix-1:ix+2,iy-1:iy+2])
+        gx, gy = np.gradient(self.m[page,ix-1:ix+2,iy-1:iy+2])
         gx = gx[1,1]
         gy = gy[1,1]
         glat = -2/np.pi*(self.RG*gx*np.cos(lon) + self.RG*gy*np.sin(lon))

@@ -67,7 +67,10 @@ def distance(long1, lat1, long2, lat2, r=3444):
                          np.cos(lat1)*np.cos(lat2)*(np.sin((long1-long2)/2))**2))
 
 class TabulatedFieldModel:
-    def __init__(self, filename):
+    def __init__(self, filename : str = None):
+        if filename is None:
+            from os.path import join, dirname
+            filename = join(dirname(__file__), 'data', 'field-3m.npy')
         self.m = np.load(filename)
         self.RG = 1145
         self.RE = 3440

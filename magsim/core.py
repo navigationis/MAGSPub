@@ -14,12 +14,12 @@ def course(lat1, long1, lat2, long2):
     
 def destination(tc, d, lat1, long1, r=3440):
     cd   = np.cos(d/r)
-    sd   = np.sqrt(1 - cd**2)
+    sd   = np.sin(d/r)
     tc = np.radians(tc)
     lat1 = np.radians(lat1)
     long1 = np.radians(long1)
     cost = np.cos(tc)
-    sint = np.sqrt(1 - cost**2)
+    sint = np.sin(tc)
     slt1 = np.sin(lat1)
     clt1 = np.cos(lat1)
     slat = slt1*cd + clt1*sd*cost
